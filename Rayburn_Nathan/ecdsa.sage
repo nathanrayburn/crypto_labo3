@@ -65,3 +65,9 @@ mchall = b"I'm taking over the CRY course. No more maths!" #challenge to sign
 (a, A) = keyGen(G, n)
 (r1, s1, ctr) = sign(G, n, a, ctr, m1)
 (r2, s2, ctr) = sign(G, n, a, ctr, m2)
+
+a = (s1 * h(m2) - s2 * alpha * h(m1) - s1 * s2 * beta) / (s2 * alpha*  r1 - s1 * r2 )
+
+(r3, s3, ctr) = sign(G,n,a,ctr,mchall)
+
+print(verify(mchall, A, r3, s3, G, n))
