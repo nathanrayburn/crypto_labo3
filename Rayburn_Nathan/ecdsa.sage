@@ -56,17 +56,19 @@ def keyGen(G, n):
     return (a, A)
 
 (G, E, n) = params()
-
-
 ctr = ZZ.random_element(n)
-m1 = b"Welcome to the CRY class"
-m2 = b"We will do maths, maths, and maths!"
-mchall = b"I'm taking over the CRY course. No more maths!" #challenge to sign
-(a, A) = keyGen(G, n)
-(r1, s1, ctr) = sign(G, n, a, ctr, m1)
-(r2, s2, ctr) = sign(G, n, a, ctr, m2)
 
-a = (s1 * h(m2) - s2 * alpha * h(m1) - s1 * s2 * beta) / (s2 * alpha*  r1 - s1 * r2 )
+A = E(9361893593673456024642842824815506424748212470912879327387460455788994329660, 83528305967312508517409940678329552782132756704289418101604001665775360328199)
+r1 = 26725028700552717763653834029852205569804439752293281605390558107306440027084
+s1 = 45893904656923008596485777784591005299660970175072854888850750675136743418023
+r2 = 98343838748606820253113314161238146907933036374710754281738243083201563013291
+s2 = 24687990133037862046315855050985768701320369989379490015082958186836013977906
+m1 = b'Welcome to the CRY class'
+m2 = b'We will do maths, maths, and maths!'
+mchall = b"I'm taking over the CRY course. No more maths!"
+
+
+a = ((s1 * h(m2) - s2 * alpha * h(m1) - s1 * s2 * beta) / (s2 * alpha*  r1 - s1 * r2 )) % n
 
 (r3, s3, ctr) = sign(G,n,a,ctr,mchall)
 
