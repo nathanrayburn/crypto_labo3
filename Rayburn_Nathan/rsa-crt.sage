@@ -36,7 +36,7 @@ This function key gens the values we need to test if our hack function is workin
 def generate():
     (e, d, n, p, q) = key_gen()
     m = b"This message is signed with RSA-CRT!"
-    s = sign(m, d, p, q, n)
+    s = sign(m, d, p, q, n)                                                                 # generate signature with the vuln.
     print("Our defined values ----------------------------------------")
     print("e = %s" % str(e))
     print("------------------------------------------------------------------")
@@ -46,10 +46,18 @@ def generate():
     print("------------------------------------------------------------------")
     print("d = %s" %str(d))
     print("------------------------------------------------------------------")
-    s = sign(m, d, p, q, n)                                     # generate signature with the vuln.
+    print("p = %s" %str(p))
+    print("------------------------------------------------------------------")
+    print("q = %s" %str(q))
+    print("------------------------------------------------------------------")                                                          
     print("Hacking our own key @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     print("------------------------------------------------------------------")
-    hackSignature(e,n,m,s)                                      # hack the signature with our values
+    (hacked_d) = hackSignature(e,n,m,s)                                      # hack the signature with our values
+    
+    if d == hacked_d:
+        print("Private key found")
+    
+
 '''
 This function is designed to validate a signature
 '''
@@ -81,12 +89,15 @@ def hackSignature(e,n,m,s):
     print("------------------------------------------------------------------")
     print(f"D = {d}")
     print("------------------------------------------------------------------")
+    
     test_signature = signatureWorking(m,d,p,q,n)                # Create the real signature
 
     if validateSignature(m,test_signature,e,n):                 # Validate the signature 
         print("Signature ok")
+        return d
     else:
         print("Signature nok")
+        return 0,0,0
     
 
 generate()
@@ -98,5 +109,5 @@ n = 8829698272894796058566294092055666782872126452750807746555129369227000637915
 m = b'This message is signed with RSA-CRT!'
 s = 1190917722554178976753284795976688079717481278145993359514513523002036421742572019056865149314632211957040146691028385960597271303411600301272701748873052408939851883089095533903577536549890067654008607578494850765837313788269107848805351486952352373644128856961650613358088819654810410851390931346123802667127784725039647324201895017876605812491526421344457190986345555060175226121768598324888030825387334263332374598728878741248557873773083893721574459604443324611561844080894155789143922264867919685671883927600397121829193609647416838947723115309462560898899772203749883537650525041944263193976056655064867573514
 
-hackSignature(e,n,m,s)
+#hackSignature(e,n,m,s)
 
