@@ -48,30 +48,38 @@ def encrypt_OAEP(m, e, n):
     to_encrypt = int.from_bytes(masked_seed + masked_DB, byteorder="big")
     #textbook RSA
     return power_mod(to_encrypt, e, n)
+    
 def textbook_rsa_decrypt(c,d,n):
     return int(power_mod(c,d,n)).to_bytes(MODULE_SIZE,byteorder="big")
     
 def unpad(message):
-    padded_m = message[HASH_SIZE:]
+    padded_m = message[HASH_SIZE:]              # remove hash
     ret_m = b''
-    for i in range(len(padded_m)):
+    for i in range(len(padded_m)):              # parse everything until = 1
         if _sage_const_1  == padded_m[i]:
-            ret_m = padded_m[i+_sage_const_1 :]
-    return ret_m 
+            ret_m = padded_m[i+_sage_const_1 :]              # select the message
+    return ret_m                                # return the message
 
 def decrypt_OAEP(c,d,n):
 
-    masked_message = textbook_rsa_decrypt(c,d,n)
+    masked_message = textbook_rsa_decrypt(c,d,n)    # decrypt with textbook rsa
 
-    masked_DB = masked_message[SEED_SIZE+_sage_const_1 :]
+    masked_DB = masked_message[SEED_SIZE+_sage_const_1 :]        # recover masked DB
 
-    masked_seed = masked_message[_sage_const_1 :SEED_SIZE+_sage_const_1 ]
+    masked_seed = masked_message[_sage_const_1 :SEED_SIZE+_sage_const_1 ]     # recover masked seed
 
-    mgf_db = mgf(masked_DB,len(masked_seed))
-    seed = strxor(masked_seed, mgf_db)
-    hashed_seed = mgf(seed,len(masked_DB))
-    hash_padded_m = strxor(hashed_seed,masked_DB)
-    return unpad(hash_padded_m)
+    mgf_db = mgf(masked_DB,len(masked_seed))        # pass through function to later find the seed
+
+    seed = strxor(masked_seed, mgf_db)              # calculate seed
+
+    hashed_seed = mgf(seed,len(masked_DB))          # hash the seed 
+
+    hash_padded_m = strxor(hashed_seed,masked_DB)   # calculate the original hash+pad+message
+
+    return unpad(hash_padded_m)                     # remove pad
+    '''
+    This function is designed to encrypt with a seed of choice
+    '''
 def reversed_RSA_AEP(m,e,n,seed):
     seed = seed.to_bytes(_sage_const_1 , byteorder="big")
     if len(m) > MAX_MESSAGE_SIZE:
@@ -80,14 +88,13 @@ def reversed_RSA_AEP(m,e,n,seed):
     zeros = b"\x00" * (MODULE_SIZE - HASH_SIZE  - SEED_SIZE - len(m) - _sage_const_2 )
     padded_m = HL + zeros + b"\x01" + m
     masked_DB = strxor(padded_m, mgf(seed, len(padded_m)))
-    print(len(masked_DB))
     masked_seed = strxor(seed, mgf(masked_DB, len(seed)))
     to_encrypt = int.from_bytes(masked_seed + masked_DB, byteorder="big")
 
     return power_mod(to_encrypt, e, n)
 def bruteForceAttack(c, e, n):
     print(f"Searching for {c}")  # Grade to find
-    
+    print("---------------------------------------------------------------")
     for i in range(_sage_const_256 ):        
         for j in range(_sage_const_61 ):
             grade_to_test = round(j * _sage_const_0p1 , _sage_const_1 )
@@ -96,7 +103,6 @@ def bruteForceAttack(c, e, n):
             
             try:
                 find = reversed_RSA_AEP(grade_to_test_bytes, e, n, i)
-                print(f"Current Grade: {c}")
                 print(f"Current find : {find}")                
                 if c == find:
                     print(f"Found grade: {grade_to_test}")

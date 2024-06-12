@@ -32,45 +32,53 @@ def signatureWorking(m, d, p, q, n):
     print("SP = %s" % str(sp))
     sq = power_mod(h, dq, q)
     return crt([sp, sq], [p, q])
+'''
+This function key gens the values we need to test if our hack function is working
+
+'''
 def generate():
     (e, d, n, p, q) = key_gen()
     m = b"This message is signed with RSA-CRT!"
     s = sign(m, d, p, q, n)
+
     print("e = %s" % str(e))
     print("n = %s" %str(n))
     print("s = %s" %s)
 
-    s = sign(m, d, p, q, n)
-
-    hackSignature(e,n,m,s)
-
+    s = sign(m, d, p, q, n)                                     # generate signature with the vuln.
+    
+    hackSignature(e,n,m,s)                                      # hack the signature with our values
+'''
+This function is designed to validate a signature
+'''
 def validateSignature(m,s,e,n):
-    h = int.from_bytes(sha256(m).digest(), byteorder = "big")
-    mprime = power_mod(s,e,n)
-    print(f" if {mprime} == {h}")
+    h = int.from_bytes(sha256(m).digest(), byteorder = "big")   # message hash
+    mprime = power_mod(s,e,n)                                   # calculate message hash from signature
+    print(f" if {mprime} == {h}")                               # check if the message hash corresponds with the signature
     if mprime == h:
         return true
     return false
 def hackSignature(e,n,m,s):
+    
     ###### RSA-CRT
 
-    mprime = power_mod(s,e,n)
-    h = int.from_bytes(sha256(m).digest(), byteorder = "big")
+    mprime = power_mod(s,e,n)                                   # find corrupted m prime
+    h = int.from_bytes(sha256(m).digest(), byteorder = "big")   # message hash
     
     print(f"mprime : {mprime}")
     print(f"message hash: {h}")
 
-    p = gcd(h-mprime,n)
-    q = n/p
-    d = power_mod(e,-1, (p-1)*(q-1))
+    p = gcd(h-mprime,n)                                         # exploiting the vulnerability
+    q = n/p                                                     # Calculate Q with P from N
+    d = power_mod(e,-1, (p-1)*(q-1))                            # Calculate the private key
 
     print(f"P = {p}")
     print(f"Q = {q}")
     print(f"D = {d}")
     
-    test_signature = signatureWorking(m,d,p,q,n)
+    test_signature = signatureWorking(m,d,p,q,n)                # Create the real signature
 
-    if validateSignature(m,test_signature,e,n):
+    if validateSignature(m,test_signature,e,n):                 # Validate the signature 
         print("Signature ok")
     else:
         print("Signature nok")
