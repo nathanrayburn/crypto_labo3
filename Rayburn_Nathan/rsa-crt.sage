@@ -83,11 +83,11 @@ def hackSignature(e,n,m,s):
     q = n/p                                                     # Calculate Q with P from N
     d = power_mod(e,-1, (p-1)*(q-1))                            # Calculate the private key, phi(N) = (p-1) * (q-1)
 
-    print(f"P = {p}")
+    print(f"Cracked P = {p}")
     print("------------------------------------------------------------------")
-    print(f"Q = {q}")
+    print(f"Cracked Q = {q}")
     print("------------------------------------------------------------------")
-    print(f"D = {d}")
+    print(f"Cracked D = {d}")
     print("------------------------------------------------------------------")
     
     test_signature = signatureWorking(m,d,p,q,n)                # Create the real signature
