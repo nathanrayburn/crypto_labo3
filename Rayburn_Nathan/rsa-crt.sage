@@ -70,7 +70,7 @@ def hackSignature(e,n,m,s):
 
     p = gcd(h-mprime,n)                                         # exploiting the vulnerability
     q = n/p                                                     # Calculate Q with P from N
-    d = power_mod(e,-1, (p-1)*(q-1))                            # Calculate the private key
+    d = power_mod(e,-1, (p-1)*(q-1))                            # Calculate the private key, phi(N) = (p-1) * (q-1)
 
     print(f"P = {p}")
     print(f"Q = {q}")
